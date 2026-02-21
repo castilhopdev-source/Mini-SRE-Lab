@@ -35,20 +35,16 @@ Tudo rodando com:
 - 👉 Docker  
 - 👉 Docker Compose  
 
----
-
 ## 📂 Estrutura do Projeto
+
+
 sre-lab/
-│
 ├── docker-compose.yml
-│
 ├── nginx/
 │ ├── Dockerfile
 │ └── index.html
-│
 ├── monitor/
 │ ├── Dockerfile
 │ ├── monitor.py
 │ └── requirements.txt
-│
 └── README.md
