@@ -6,13 +6,45 @@ services: #🧱 Definição de Serviços: Aqui começa a definição dos contain
     build: ./nginx #📌 O que faz: Instrui o Compose a: Construir a imagem usando o Dockerfile dentro da pasta ./nginx | Equivalente a: docker build -t nginx ./nginx
     container_name: sre_nginx # 📌 O que faz: Define nome fixo do container, isso facilita: Debug, Logs e Simulação de falhas
     ports:  ###### 📌 O que faz: Mapeia portas | Porta 8080 da sua máquina | Para porta 80 do container | Assim você pode acessar: http://localhost:8080
-      - "8080:80" 
-
+      - "8080:80"
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
   monitor:
     build: ./monitor
     container_name: sre_monitor 
     depends_on: # 📌 O que faz: Garante que o nginx seja iniciado antes do monitor, ⚠️ Importante Isso não garante que o nginx esteja pronto, apenas que foi iniciado. 
       - nginx
+  prometheus:
+    image: prom/prometheus
+    container_name: sre_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - monitor
+  chaos:
+    build: ./chaos
+    container_name: sre_chaos 
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock #Permite que o container controle o Docker host, isso é poderoso — e perigoso em produção, mas em lab é perfeito.
+    depends_on:
+      - nginx
+  grafana:
+    image: grafana/grafana
+    container_name: sre_grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+volumes:
+  grafana_data:
 
 #📄 Arquivo: docker-compose.yml
 #🎯 Objetivo

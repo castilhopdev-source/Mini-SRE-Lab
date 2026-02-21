@@ -1,0 +1,7 @@
+FROM docker:cli
+
+WORKDIR /app
+COPY chaos.sh .
+RUN chmod +x chaos.sh
+
+CMD ["sh", "chaos.sh"]

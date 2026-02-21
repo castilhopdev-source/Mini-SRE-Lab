@@ -1,38 +1,25 @@
 import requests
 import time
+from prometheus_client import start_http_server, Counter
 
-URL = "http://nginx" 
-TOTAL = 0
-SUCCESS = 0
+REQUESTS_TOTAL = Counter('requests_total', 'Total requests made')
+FAILURES_TOTAL = Counter('failures_total', 'Total failures detected')
 
-SLO = 99.0  # Meta de disponibilidade
+start_http_server(8000)
 
 while True:
-    TOTAL += 1
-    
     try:
-        start = time.time()
-        response = requests.get(URL, timeout=2)
-        latency = time.time() - start
-        
-        if response.status_code == 200:
-            SUCCESS += 1
-            status = "OK"
-        else:
-            status = "ERROR"
-    
-    except Exception:
-        status = "DOWN"
-    
-    availability = (SUCCESS / TOTAL) * 100
-    
-    print(f"Req: {TOTAL} | Status: {status} | Availability: {availability:.2f}%")
-    
-    if availability < SLO:
-        print("⚠️ SLO VIOLATED!")
-    
-    time.sleep(5)
+        REQUESTS_TOTAL.inc()
+        response = requests.get("http://nginx", timeout=2)
 
+        if response.status_code != 200:
+            FAILURES_TOTAL.inc()
+
+    except Exception:
+        FAILURES_TOTAL.inc()
+
+    time.sleep(5)
+    
 
     #📄 Arquivo: monitor.py
 #🎯 Objetivo
