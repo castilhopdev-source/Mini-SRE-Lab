@@ -38,13 +38,5 @@ Tudo rodando com:
 ## 📂 Estrutura do Projeto
 
 
-sre-lab/
-├── docker-compose.yml
-├── nginx/
-│ ├── Dockerfile
-│ └── index.html
-├── monitor/
-│ ├── Dockerfile
-│ ├── monitor.py
-│ └── requirements.txt
-└── README.md
+<img width="660" height="299" alt="image" src="https://github.com/user-attachments/assets/377e9ff8-e48f-4657-b8b1-78cbc5d19aa2" />
+
