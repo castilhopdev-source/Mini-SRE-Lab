@@ -1,0 +1,52 @@
+
+FROM python:3.11-slim 
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY monitor.py .
+CMD ["python", "monitor.py"]  
+
+#Arquivo: monitor/Dockerfile
+#    🎯 Objetivo
+#    Criar a imagem do container responsável por:
+#    Executar o monitor
+#    Fazer requisições HTTP no serviço nginx
+#    Coletar SLIs (disponibilidade e latência)
+#    Comparar com o SLO definido
+#    Esse container representa o "SRE monitor externo", que observa o serviço como um usuário real observaria.
+
+#📌 O que faz:
+# FROM python:3.11-slim
+#Define a imagem base.
+#Usa Python 3.11
+#Versão slim (mais leve)
+#Reduz tamanho da imagem
+#Menor superfície de ataque (segurança)
+#💡 Conceito SRE envolvido:
+#Imagens menores → menos vulnerabilidades → melhor confiabilidade.
+
+#FROM python:3.11-slim
+#📌 O que faz:
+#Define /app como diretório de trabalho dentro do container.
+#Tudo que rodar depois disso acontece dentro desse diretório.
+
+#COPY requirements.txt .
+#📌 O que faz:
+#Copia o arquivo requirements.txt do seu projeto local para dentro do container.
+#Sem isso, o container não saberia quais dependências instalar.
+
+#RUN pip install -r requirements.txt
+#📌 O que faz:
+#Instala as dependências Python.
+
+#COPY monitor.py .
+#📌 O que faz:
+#Copia o código principal do monitor para dentro do container.
+#Agora o container tem:
+#O código
+#As dependências
+#O ambiente Python
+
+#CMD ["python", "monitor.py"]
+#📌 O que faz:
+#Define o comando padrão quando o container inicia.
