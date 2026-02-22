@@ -37,70 +37,57 @@ Tudo rodando com:
 
 ## 📂 Estrutura do Projeto
 
-
-<img width="660" height="299" alt="image" src="https://github.com/user-attachments/assets/377e9ff8-e48f-4657-b8b1-78cbc5d19aa2" />
-
-
-## Arquivo: docker-compose.yml
-
-O arquivo `docker-compose.yml` define a arquitetura do laboratório.
-
-Ele orquestra dois serviços:
-
-- `nginx`: serviço monitorado
-- `monitor`: sistema de observabilidade
-
-O Docker Compose cria automaticamente uma rede interna, permitindo que o monitor acesse o serviço via hostname `nginx`.
-
-Essa separação simula uma arquitetura real onde o sistema de monitoramento é externo ao serviço monitorado.
-
-## Arquivo: nginx/Dockerfile
-
-O container `nginx` representa o serviço monitorado no laboratório.
-
-Ele serve uma página estática via HTTP e simula um sistema em produção.  
-É a partir dele que o monitor coleta SLIs de disponibilidade e latência.
-
-A imagem é baseada em `nginx:alpine` para manter leveza e simplicidade.
-
-## Arquivo: nginx/index.html
-
-O arquivo `index.html` representa o conteúdo servido pelo container nginx.
-Ele funciona como uma aplicação web simples que retorna HTTP 200 quando está saudável.
+<img width="303" height="410" alt="image" src="https://github.com/user-attachments/assets/da5b0f42-f18a-4beb-bc31-c29340b1ced1" />
 
 
 
+## 📌 Descrição dos Serviços e Arquivos
 
-## Arquivo: monitor/Dockerfile
+### 📁 chaos/
 
+- **chaos/chaos.sh**  
+  Script responsável por simular falhas no ambiente, interrompendo serviços para testar disponibilidade, SLI e consumo de error budget.
 
-O container `monitor` é responsável por executar o sistema de observabilidade do projeto.
+- **chaos/dockerfile**  
+  Define a imagem Docker utilizada para executar os testes de chaos engineering no ambiente controlado.
 
-Ele realiza requisições HTTP periódicas ao serviço `nginx`, coletando métricas de disponibilidade e latência (SLIs).  
-Essas métricas são comparadas com o SLO definido, permitindo simular consumo de error budget e violação de confiabilidade.
+---
 
-A imagem é baseada em `python:3.11-slim` para reduzir tamanho e manter o ambiente mínimo necessário para execução.
+### 📁 monitor/
 
-## Arquivo: monitor/requirements.txt
+- **monitor/dockerfile**  
+  Define a imagem Docker do serviço de monitoramento, incluindo dependências Python necessárias para execução do monitor.
 
-O arquivo `requirements.txt` define as dependências Python necessárias para o container de monitoramento.
+- **monitor/monitor.py**  
+  Aplicação responsável por:
+  - Realizar requisições HTTP ao serviço alvo (nginx)
+  - Calcular o SLI de disponibilidade
+  - Comparar com o SLO definido
+  - Exibir alertas quando o error budget é consumido
 
-Neste projeto utilizamos:
+- **monitor/requirements.txt**  
+  Lista de dependências Python utilizadas pelo serviço de monitoramento.
 
-- **requests** → Biblioteca responsável por realizar requisições HTTP ao serviço Nginx.
+---
 
+### 📁 nginx/
 
-## Arquivo: monitor/monitor.py
+- **nginx/dockerfile**  
+  Define a imagem Docker do serviço web baseado em NGINX.
 
-O arquivo `monitor.py` implementa um sistema simplificado de monitoramento inspirado em práticas de SRE.
+- **nginx/index.html**  
+  Página estática servida pelo NGINX, utilizada como endpoint de teste para cálculo de disponibilidade.
 
-Ele executa requisições HTTP periódicas ao serviço `nginx`, medindo:
+---
 
-- Disponibilidade (percentual de respostas HTTP 200)
-- Latência (tempo de resposta)
+### 📄 Arquivos na raiz
 
-Essas métricas representam os SLIs do sistema.
+- **docker-compose.yml**  
+  Orquestra os serviços do ambiente (nginx, monitor e chaos), definindo redes, build e dependências.
 
-O script compara continuamente o SLI de disponibilidade com o SLO definido (99%).  
-Caso a disponibilidade fique abaixo da meta, o sistema indica violação de SLO, simulando consumo de error budget.
+- **prometheus.yml**  
+  Arquivo de configuração do Prometheus para coleta de métricas do ambiente.
+
+- **README.md**  
+  Documentação principal do projeto.
 
