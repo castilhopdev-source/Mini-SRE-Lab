@@ -14,21 +14,42 @@ Simular:
 ---
 
 ## 🧱 Arquitetura Geral
-            +------------------+
-            |   Monitor App    |
-            |  (Python)        |
-            |  - Calcula SLI   |
-            |  - Valida SLO    |
-            |  - Alerta        |
-            +--------+---------+
-                     |
-                     | HTTP
-                     ↓
-            +------------------+
-            |     NGINX        |
-            |  (App alvo)      |
-            |  Porta 80        |
-            +------------------+
+                +----------------------+
+                |      Load Gen        |
+                | (curl loop infinito) |
+                +----------+-----------+
+                           |
+                           ↓
+                +----------------------+
+                |        NGINX         |
+                |   Serviço Web (80)   |
+                +----------+-----------+
+                           |
+                           ↓
+                +----------------------+
+                |      Monitor App     |
+                |  - requests_total    |
+                |  - failures_total    |
+                +----------+-----------+
+                           |
+                           ↓
+                +----------------------+
+                |      Prometheus      |
+                |  - SLI              |
+                |  - SLO              |
+                |  - Burn Rate        |
+                +----------+-----------+
+                           |
+                           ↓
+                +----------------------+
+                |       Grafana        |
+                |  Dashboards & Alerts |
+                +----------------------+
+
+                +----------------------+
+                |       Chaos          |
+                |  Injeta HTTP 500     |
+                +----------------------+
             
 Tudo rodando com:
 

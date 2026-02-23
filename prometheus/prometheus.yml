@@ -1,0 +1,23 @@
+# ------------------------------------------------------------
+# Prometheus Configuration - Mini SRE Lab
+#
+# Configura o Prometheus para:
+# - Coletar métricas a cada 15 segundos.
+# - Realizar scraping do serviço "monitor" na porta 8000.
+# - Carregar regras de alerta localizadas em rules/*.yml.
+#
+# O serviço monitor expõe métricas de disponibilidade
+# que serão utilizadas para cálculo de taxa de erro
+# e validação de alertas durante a injeção de falhas.
+# ------------------------------------------------------------
+
+global:
+  scrape_interval: 15s
+
+rule_files:
+  - "rules/*.yml"
+
+scrape_configs:
+  - job_name: "monitor"
+    static_configs:
+      - targets: ["monitor:8000"]

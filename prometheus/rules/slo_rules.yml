@@ -1,0 +1,42 @@
+# ------------------------------------------------------------
+# SLO Recording Rules - Mini SRE Lab
+#
+# Define métricas derivadas para cálculo de SLI, SLO,
+# error budget e burn rate com base nas métricas do monitor.
+#
+# Métricas criadas:
+# - sli:availability_5m → Disponibilidade nos últimos 5 minutos
+# - sli:error_rate_5m   → Taxa de erro nos últimos 5 minutos
+# - slo:target          → Meta de disponibilidade (99%)
+# - slo:error_budget    → Orçamento de erro permitido
+# - slo:burn_rate_5m    → Velocidade de consumo do error budget
+#
+# Utilizado para validação de incidentes simulados via chaos.
+# ------------------------------------------------------------
+
+groups:
+  - name: slo_rules
+    rules:
+      - record: sli:availability_5m
+        expr: 
+          1 -
+          (
+            sum(rate(failures_total{job="monitor"}[5m]))
+            /
+            clamp_min(sum(rate(requests_total{job="monitor"}[5m])), 1)
+          )
+      - record: sli:error_rate_5m
+        expr: | 
+          sum(rate(failures_total{job="monitor"}[5m]))
+          /
+          sum(rate(requests_total{job="monitor"}[5m]))
+      - record: slo:target
+        expr: 0.99
+
+      - record: slo:error_budget
+        expr: 1 - slo:target
+      - record: slo:burn_rate_5m
+        expr: |
+          sli:error_rate_5m
+          /
+          slo:error_budget

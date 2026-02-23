@@ -1,45 +1,5 @@
+# Serviço web simples (Nginx) que será monitorado
+# e utilizado como alvo para injeção de falhas.
+
 FROM nginx:alpine
 COPY index.html /usr/share/nginx/html/index.html
-
-#📄 Arquivo: nginx/Dockerfile
-#🎯 Objetivo
-#Criar a imagem do serviço que será monitorado.
-#Ele simula:
-#Uma aplicação web
-#Um serviço HTTP real
-#Um sistema em produção
-#Baseado no NGINX rodando dentro do Docker.
-
-#FROM nginx:alpine
-#📌 O que faz:
-#Define a imagem base.
-#Usa NGINX oficial
-#Versão Alpine (Linux minimalista)
-#Imagem leve
-#Rápida para subir
-#Menor superfície de ataque
-#💡 Por que Alpine é interessante?
-#Tamanho pequeno (~5MB base)
-#Ideal para containers
-#Menor consumo de recursos
-#Do ponto de vista de SRE:
-#Serviços leves sobem mais rápido e consomem menos recursos → melhor eficiência operacional.
-
-#COPY index.html /usr/share/nginx/html/index.html
-#📌 O que faz:
-#Copia o seu arquivo HTML personalizado para dentro do container.
-
-#🧠 O que esse container representa na arquitetura?
-#Ele representa:
-#O serviço que precisa manter alta disponibilidade.
-#No mundo real poderia ser:
-#Uma API
-#Um backend Node.js
-#Um microserviço
-#Um frontend
-#Um gateway
-#Aqui estamos usando NGINX porque:
-#É simples
-#É leve
-#Permite simular falhas facilmente
-#Foco é no monitoramento, não na aplicação

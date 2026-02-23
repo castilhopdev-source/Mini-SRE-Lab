@@ -1,3 +1,6 @@
+# Container que executa o chaos.sh para simular falhas
+# no Nginx usando docker exec (via docker:cli).
+
 FROM docker:cli
 
 WORKDIR /app

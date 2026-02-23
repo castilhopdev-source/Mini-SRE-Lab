@@ -7,12 +7,14 @@ services: #🧱 Definição de Serviços: Aqui começa a definição dos contain
     container_name: sre_nginx # 📌 O que faz: Define nome fixo do container, isso facilita: Debug, Logs e Simulação de falhas
     ports:  ###### 📌 O que faz: Mapeia portas | Porta 8080 da sua máquina | Para porta 80 do container | Assim você pode acessar: http://localhost:8080
       - "8080:80"
-    restart: always
+    restart: unless-stopped
+    #restart: always
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      test: ["CMD", "curl", "-f", "http://localhost || exit 0"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
   monitor:
     build: ./monitor
     container_name: sre_monitor 
@@ -24,16 +26,19 @@ services: #🧱 Definição de Serviços: Aqui começa a definição dos contain
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus:/etc/prometheus
     depends_on:
       - monitor
   chaos:
     build: ./chaos
     container_name: sre_chaos 
     volumes:
+      - ./chaos:/app
       - /var/run/docker.sock:/var/run/docker.sock #Permite que o container controle o Docker host, isso é poderoso — e perigoso em produção, mas em lab é perfeito.
+    working_dir: /app
     depends_on:
       - nginx
+    command: sh -c "echo 'Waiting 2 minutes before chaos...'; sleep 120; sh chaos.sh"
   grafana:
     image: grafana/grafana
     container_name: sre_grafana
@@ -43,6 +48,11 @@ services: #🧱 Definição de Serviços: Aqui começa a definição dos contain
       - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
+  traffic:
+    image: curlimages/curl
+    command: sh -c "while true; do curl -s -o /dev/null http://localhost:8080; sleep 0.2; done" # Gera tráfego contínuo (5 req/s) para http://localhost:8080 em loop infinito, simulando carga na aplicação.
+    depends_on:
+      - nginx
 volumes:
   grafana_data:
 
