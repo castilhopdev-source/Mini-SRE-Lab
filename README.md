@@ -2,16 +2,17 @@
 
 ## 🎯 Objetivo
 
-Simular:
+Construir um laboratório prático de SRE que simula um ambiente de produção contendo:
 
-- Serviço web (**nginx**)
-- Monitor externo
-- Coleta de SLIs
-- Comparação com SLO
-- Simulação de falhas
-- Cálculo de error budget
+- 🌐 Serviço web (Nginx)
+- 📊 Monitoramento sintético
+- 🔍 Coleta de métricas com Prometheus
+- 📈 Definição e cálculo de SLI / SLO
+- 💰 Gestão de Error Budget
+- 🔥 Injeção de falhas com Chaos Engineering
 
----
+O objetivo é demonstrar, de forma prática, como medir confiabilidade,
+avaliar impacto de incidentes e analisar consumo de orçamento de erro.
 
 ## 🧱 Arquitetura Geral
                 +----------------------+
@@ -57,58 +58,101 @@ Tudo rodando com:
 - 👉 Docker Compose  
 
 ## 📂 Estrutura do Projeto
-
-<img width="303" height="410" alt="image" src="https://github.com/user-attachments/assets/da5b0f42-f18a-4beb-bc31-c29340b1ced1" />
-
+<img width="291" height="455" alt="image" src="https://github.com/user-attachments/assets/1010bb4e-eedb-49fb-b765-7a97ac2e528e" />
 
 
-## 📌 Descrição dos Serviços e Arquivos
 
-### 📁 chaos/
 
-- **chaos/chaos.sh**  
-  Script responsável por simular falhas no ambiente, interrompendo serviços para testar disponibilidade, SLI e consumo de error budget.
+📌 Descrição dos Serviços e Arquivos
+📁 chaos/
 
-- **chaos/dockerfile**  
-  Define a imagem Docker utilizada para executar os testes de chaos engineering no ambiente controlado.
+chaos/chaos.sh
+Script responsável por injetar falhas controladas no Nginx.
+A cada intervalo definido, força respostas HTTP 500 temporariamente, simulando incidentes e permitindo validar SLIs, SLO e consumo de error budget.
 
----
+chaos/Dockerfile
+Define a imagem baseada em docker:cli, permitindo executar comandos docker exec para modificar dinamicamente a configuração do Nginx durante os testes de chaos engineering.
 
-### 📁 monitor/
+📁 monitor/
 
-- **monitor/dockerfile**  
-  Define a imagem Docker do serviço de monitoramento, incluindo dependências Python necessárias para execução do monitor.
+monitor/Dockerfile
+Define a imagem Docker do serviço de monitoramento sintético, baseada em python:3.11-slim, incluindo as dependências necessárias para geração e exposição de métricas.
 
-- **monitor/monitor.py**  
-  Aplicação responsável por:
-  - Realizar requisições HTTP ao serviço alvo (nginx)
-  - Calcular o SLI de disponibilidade
-  - Comparar com o SLO definido
-  - Exibir alertas quando o error budget é consumido
+monitor/monitor.py
+Serviço responsável por:
 
-- **monitor/requirements.txt**  
-  Lista de dependências Python utilizadas pelo serviço de monitoramento.
+Realizar requisições HTTP periódicas ao Nginx
 
----
+Incrementar requests_total
 
-### 📁 nginx/
+Incrementar failures_total em caso de erro ou exceção
 
-- **nginx/dockerfile**  
-  Define a imagem Docker do serviço web baseado em NGINX.
+Expor métricas no formato Prometheus na porta 8000
 
-- **nginx/index.html**  
-  Página estática servida pelo NGINX, utilizada como endpoint de teste para cálculo de disponibilidade.
+Atua como um synthetic monitor, fornecendo os dados brutos para cálculo de SLI e SLO no Prometheus.
 
----
+monitor/requirements.txt
+Lista as dependências Python do serviço:
 
-### 📄 Arquivos na raiz
+requests
 
-- **docker-compose.yml**  
-  Orquestra os serviços do ambiente (nginx, monitor e chaos), definindo redes, build e dependências.
+prometheus_client
 
-- **prometheus.yml**  
-  Arquivo de configuração do Prometheus para coleta de métricas do ambiente.
+📁 nginx/
 
-- **README.md**  
-  Documentação principal do projeto.
+nginx/Dockerfile
+Define a imagem do serviço web baseado em nginx:alpine, que representa a aplicação monitorada no laboratório.
+
+nginx/index.html
+Página estática servida pelo Nginx.
+Quando saudável, retorna HTTP 200, permitindo o cálculo de disponibilidade.
+
+📁 prometheus/
+
+prometheus/prometheus.yml
+Configura o Prometheus para:
+
+Realizar scraping do serviço monitor
+
+Definir intervalo de coleta
+
+Carregar regras de SLO
+
+prometheus/rules/slo_rules.yml
+Define recording rules para:
+
+sli:availability_5m
+
+sli:error_rate_5m
+
+slo:target (99%)
+
+slo:error_budget
+
+slo:burn_rate_5m
+
+Responsável pelo cálculo real de SLI, SLO, error budget e burn rate.
+
+📄 Arquivos na raiz
+
+docker-compose.yml
+Orquestra todos os serviços do ambiente:
+
+nginx
+
+monitor
+
+prometheus
+
+grafana
+
+chaos
+
+load generator
+
+Define rede interna, builds e dependências entre serviços.
+
+README.md
+Documentação principal do projeto, explicando arquitetura, objetivos e conceitos de SRE implementados.
+
 
