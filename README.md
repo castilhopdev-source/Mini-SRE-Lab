@@ -64,7 +64,9 @@ Tudo rodando com:
 
 
 📌 Descrição dos Serviços e Arquivos
-📁 chaos/
+
+
+## 📁 chaos/
 
 chaos/chaos.sh
 Script responsável por injetar falhas controladas no Nginx.
@@ -73,7 +75,7 @@ A cada intervalo definido, força respostas HTTP 500 temporariamente, simulando 
 chaos/Dockerfile
 Define a imagem baseada em docker:cli, permitindo executar comandos docker exec para modificar dinamicamente a configuração do Nginx durante os testes de chaos engineering.
 
-📁 monitor/
+## 📁 monitor/
 
 monitor/Dockerfile
 Define a imagem Docker do serviço de monitoramento sintético, baseada em python:3.11-slim, incluindo as dependências necessárias para geração e exposição de métricas.
@@ -98,7 +100,7 @@ requests
 
 prometheus_client
 
-📁 nginx/
+## 📁 nginx/
 
 nginx/Dockerfile
 Define a imagem do serviço web baseado em nginx:alpine, que representa a aplicação monitorada no laboratório.
@@ -107,7 +109,7 @@ nginx/index.html
 Página estática servida pelo Nginx.
 Quando saudável, retorna HTTP 200, permitindo o cálculo de disponibilidade.
 
-📁 prometheus/
+## 📁 prometheus/
 
 prometheus/prometheus.yml
 Configura o Prometheus para:
@@ -133,7 +135,7 @@ slo:burn_rate_5m
 
 Responsável pelo cálculo real de SLI, SLO, error budget e burn rate.
 
-📄 Arquivos na raiz
+## 📄 Arquivos na raiz
 
 docker-compose.yml
 Orquestra todos os serviços do ambiente:
