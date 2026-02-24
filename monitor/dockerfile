@@ -1,10 +1,8 @@
 # ------------------------------------------------------------
 # Monitor Service - Mini SRE Lab
-#
 # Container responsável por executar o serviço monitor em Python.
 # O monitor coleta e expõe métricas (ex: requests, failures)
 # para o Prometheus realizar o scraping.
-#
 # Baseado em python:3.11-slim para manter a imagem leve.
 # ------------------------------------------------------------
 

@@ -1,11 +1,11 @@
 
 version: '3'
 
-services: #🧱 Definição de Serviços: Aqui começa a definição dos containers que fazem parte da aplicação, cada item dentro de services vira um container.
+services: #A definição dos containers que fazem parte da aplicação, cada item dentro de services vira um container.
   nginx: #Define o nome do serviço: Esse nome vira o hostname interno na rede Docker, por isso o monitor usa: #URL = "http://nginx"
-    build: ./nginx #📌 O que faz: Instrui o Compose a: Construir a imagem usando o Dockerfile dentro da pasta ./nginx | Equivalente a: docker build -t nginx ./nginx
+    build: ./nginx #Instrui o Compose a: Construir a imagem usando o Dockerfile dentro da pasta ./nginx | Equivalente a: docker build -t nginx ./nginx
     container_name: sre_nginx # 📌 O que faz: Define nome fixo do container, isso facilita: Debug, Logs e Simulação de falhas
-    ports:  ###### 📌 O que faz: Mapeia portas | Porta 8080 da sua máquina | Para porta 80 do container | Assim você pode acessar: http://localhost:8080
+    ports:  ###### Mapeia portas | Porta 8080 da sua máquina | Para porta 80 do container | Assim você pode acessar: http://localhost:8080
       - "8080:80"
     restart: unless-stopped
     #restart: always
@@ -18,7 +18,7 @@ services: #🧱 Definição de Serviços: Aqui começa a definição dos contain
   monitor:
     build: ./monitor
     container_name: sre_monitor 
-    depends_on: # 📌 O que faz: Garante que o nginx seja iniciado antes do monitor, ⚠️ Importante Isso não garante que o nginx esteja pronto, apenas que foi iniciado. 
+    depends_on: # Garante que o nginx seja iniciado antes do monitor
       - nginx
   prometheus:
     image: prom/prometheus
@@ -34,7 +34,7 @@ services: #🧱 Definição de Serviços: Aqui começa a definição dos contain
     container_name: sre_chaos 
     volumes:
       - ./chaos:/app
-      - /var/run/docker.sock:/var/run/docker.sock #Permite que o container controle o Docker host, isso é poderoso — e perigoso em produção, mas em lab é perfeito.
+      - /var/run/docker.sock:/var/run/docker.sock #Permite que o container controle o Docker host
     working_dir: /app
     depends_on:
       - nginx
@@ -50,22 +50,17 @@ services: #🧱 Definição de Serviços: Aqui começa a definição dos contain
       - prometheus
   traffic:
     image: curlimages/curl
-    command: sh -c "while true; do curl -s -o /dev/null http://localhost:8080; sleep 0.2; done" # Gera tráfego contínuo (5 req/s) para http://localhost:8080 em loop infinito, simulando carga na aplicação.
+    command: sh -c "while true; do curl -s -o /dev/null http://localhost:8080; sleep 0.2; done" # Gera o tráfego contínuo (5 req/s) para http://localhost:8080 em loop infinito, simulando carga na aplicação.
     depends_on:
       - nginx
 volumes:
   grafana_data:
 
-#📄 Arquivo: docker-compose.yml
-#🎯 Objetivo
+#Arquivo: docker-compose.yml
 #Definir e orquestrar:
 #O serviço alvo (nginx)
 #O serviço de monitoramento (monitor)
 #A rede interna entre eles
 #Dependência de inicialização
-#Ele representa, em escala menor, o que seria feito em:
-#Kubernetes
-#ECS
-#Docker Swarm
 
      
