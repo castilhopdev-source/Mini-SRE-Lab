@@ -1,18 +1,21 @@
-# 🏗️ Arquitetura – Mini SRE Lab
+# Arquitetura – Mini SRE Lab
 
-## 🎯 Objetivo
+## Objetivo
 
-Construir um laboratório prático de SRE que simula um ambiente de produção contendo:
+Meu objetivo nesse projeto foi construir um laboratório prático de SRE que simula um ambiente de produção
 
-- 🌐 Serviço web (Nginx)
-- 📊 Monitoramento sintético
-- 🔍 Coleta de métricas com Prometheus
-- 📈 Definição e cálculo de SLI / SLO
-- 💰 Gestão de Error Budget
-- 🔥 Injeção de falhas com Chaos Engineering
+Ele contém:
 
-O objetivo é demonstrar, de forma prática, como medir confiabilidade,
-avaliar impacto de incidentes e analisar consumo de orçamento de erro.
+- Serviço web (Nginx)
+- Monitoramento
+- Coleta de métricas com Prometheus
+- Definição e cálculo de SLI / SLO
+- Gestão de Error Budget
+- Injeção de falhas usando Chaos Engineering
+
+
+Com isso conseguimos criar um cenário fictício que simula erros que podem ocorrer no dia a dia, afetando nosso SLI/SLO/SLA e error Budget
+
 
 ## 🧱 Arquitetura Geral
                 +----------------------+
@@ -52,10 +55,6 @@ avaliar impacto de incidentes e analisar consumo de orçamento de erro.
                 |  Injeta HTTP 500     |
                 +----------------------+
             
-Tudo rodando com:
-
-- 👉 Docker  
-- 👉 Docker Compose  
 
 ## 📂 Estrutura do Projeto
 <img width="291" height="455" alt="image" src="https://github.com/user-attachments/assets/1010bb4e-eedb-49fb-b765-7a97ac2e528e" />
@@ -63,55 +62,51 @@ Tudo rodando com:
 
 
 
-📌 Descrição dos Serviços e Arquivos
+Vou resumir o que cada arquivo do meu projeto faz: 
 
 
 ## 📁 chaos/
 
 chaos/chaos.sh
-Script responsável por injetar falhas controladas no Nginx.
-A cada intervalo definido, força respostas HTTP 500 temporariamente, simulando incidentes e permitindo validar SLIs, SLO e consumo de error budget.
+
+Um Script curto que eu criei, porém importante, ele vai simular as falhas controladas no Nginx e forçar respostas HTTP 500 temporariamente.
+Simulando e permitindo validar SLIs, Slo e error Budget
 
 chaos/Dockerfile
-Define a imagem baseada em docker:cli, permitindo executar comandos docker exec para modificar dinamicamente a configuração do Nginx durante os testes de chaos engineering.
+Container que executa o chaos.sh para simular falhas
 
 ## 📁 monitor/
 
 monitor/Dockerfile
-Define a imagem Docker do serviço de monitoramento sintético, baseada em python:3.11-slim, incluindo as dependências necessárias para geração e exposição de métricas.
+
+É o container responsável por executar o serviço monitor em Python.
 
 monitor/monitor.py
-Serviço responsável por:
 
-Realizar requisições HTTP periódicas ao Nginx
-
-Incrementar requests_total
-
-Incrementar failures_total em caso de erro ou exceção
-
-Expor métricas no formato Prometheus na porta 8000
-
-Atua como um synthetic monitor, fornecendo os dados brutos para cálculo de SLI e SLO no Prometheus.
+Usando Python vamos realizar requisições HTTP durante alguns intervalos no Nginx para extrairmos os valores de requests_total e failures_total
 
 monitor/requirements.txt
+
 Lista as dependências Python do serviço:
-
 requests
-
 prometheus_client
 
 ## 📁 nginx/
 
 nginx/Dockerfile
-Define a imagem do serviço web baseado em nginx:alpine, que representa a aplicação monitorada no laboratório.
+
+Aqui usamos a iamgem do nosso serviço web baseada em nginx:alpine, que representa a nossa aplicação que vai ser monitorada no nosso Lab
 
 nginx/index.html
-Página estática servida pelo Nginx.
-Quando saudável, retorna HTTP 200, permitindo o cálculo de disponibilidade.
+
+Nossa página que roda no Nginx
+Ela é quem a gente verifica os status de HTTP(200,500 e etc) permitindo o cálculo de disponibilidade
+
 
 ## 📁 prometheus/
 
 prometheus/prometheus.yml
+
 Configura o Prometheus para:
 
 Realizar scraping do serviço monitor
@@ -121,7 +116,7 @@ Definir intervalo de coleta
 Carregar regras de SLO
 
 prometheus/rules/slo_rules.yml
-Define recording rules para:
+Aqui eu construi as rules para o prometheus:
 
 sli:availability_5m
 
@@ -135,10 +130,14 @@ slo:burn_rate_5m
 
 Responsável pelo cálculo real de SLI, SLO, error budget e burn rate.
 
+Eu defini 5 minutos para que eu consiga subir o projeto e ter uma visualização boa no Grafana, consiga ver o SLI sendo afetado e as demais métricas
+
+
+
 ## 📄 Arquivos na raiz
 
 docker-compose.yml
-Orquestra todos os serviços do ambiente:
+Orquestra todos os meus serviços do ambiente:
 
 nginx
 
@@ -155,6 +154,6 @@ load generator
 Define rede interna, builds e dependências entre serviços.
 
 README.md
-Documentação principal do projeto, explicando arquitetura, objetivos e conceitos de SRE implementados.
+Documentação do meu projeto em markdown
 
 
