@@ -4,7 +4,7 @@ version: '3'
 services: #A definição dos containers que fazem parte da aplicação, cada item dentro de services vira um container.
   nginx: #Define o nome do serviço: Esse nome vira o hostname interno na rede Docker, por isso o monitor usa: #URL = "http://nginx"
     build: ./nginx #Instrui o Compose a: Construir a imagem usando o Dockerfile dentro da pasta ./nginx | Equivalente a: docker build -t nginx ./nginx
-    container_name: sre_nginx # 📌 O que faz: Define nome fixo do container, isso facilita: Debug, Logs e Simulação de falhas
+    container_name: sre_nginx #  Define nome fixo do container, isso facilita: Debug, Logs e Simulação de falhas
     ports:  ###### Mapeia portas | Porta 8080 da sua máquina | Para porta 80 do container | Assim você pode acessar: http://localhost:8080
       - "8080:80"
     restart: unless-stopped
