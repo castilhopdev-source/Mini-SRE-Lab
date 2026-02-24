@@ -14,10 +14,10 @@ Ele contém:
 - Injeção de falhas usando Chaos Engineering
 
 
-Com isso conseguimos criar um cenário fictício que simula erros que podem ocorrer no dia a dia, afetando nosso SLI/SLO/SLA e error Budget
+Com isso foi criado um cenário fictício que simula erros que podem ocorrer no dia a dia, afetando nosso SLI/SLO/SLA e error Budget
 
 
-## 🧱 Arquitetura Geral
+## Arquitetura Geral
                 +----------------------+
                 |      Load Gen        |
                 | (curl loop infinito) |
@@ -56,7 +56,7 @@ Com isso conseguimos criar um cenário fictício que simula erros que podem ocor
                 +----------------------+
             
 
-## 📂 Estrutura do Projeto
+## Estrutura do Projeto
 <img width="291" height="455" alt="image" src="https://github.com/user-attachments/assets/1010bb4e-eedb-49fb-b765-7a97ac2e528e" />
 
 
@@ -65,7 +65,7 @@ Com isso conseguimos criar um cenário fictício que simula erros que podem ocor
 Vou resumir o que cada arquivo do meu projeto faz: 
 
 
-## 📁 chaos/
+## chaos/
 
 chaos/chaos.sh
 
@@ -75,7 +75,7 @@ Simulando e permitindo validar SLIs, Slo e error Budget
 chaos/Dockerfile
 Container que executa o chaos.sh para simular falhas
 
-## 📁 monitor/
+## monitor/
 
 monitor/Dockerfile
 
@@ -91,7 +91,7 @@ Lista as dependências Python do serviço:
 requests
 prometheus_client
 
-## 📁 nginx/
+## nginx/
 
 nginx/Dockerfile
 
@@ -103,7 +103,7 @@ Nossa página que roda no Nginx
 Ela é quem a gente verifica os status de HTTP(200,500 e etc) permitindo o cálculo de disponibilidade
 
 
-## 📁 prometheus/
+## prometheus/
 
 prometheus/prometheus.yml
 
@@ -134,7 +134,7 @@ Eu defini 5 minutos para que eu consiga subir o projeto e ter uma visualização
 
 
 
-## 📄 Arquivos na raiz
+## Arquivos na raiz
 
 docker-compose.yml
 Orquestra todos os meus serviços do ambiente:
